@@ -1,0 +1,10 @@
+name: Prace
+version: 1.0
+main: io.github.katsumag.prace.Prace
+api-version: 1.13
+author: katsumag
+softdepend:
+  - Vault
+commands:
+  prace:
+    description: Prace main GUI!
