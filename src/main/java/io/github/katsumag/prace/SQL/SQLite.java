@@ -17,17 +17,17 @@ public class SQLite extends Database{
         dbname = plugin.getConfig().getString("SQLite.Filename", "Prace"); // Set the table name here e.g player_kills
     }
 
-    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS Prace (" + // make sure to put your table name in here too.
-            "`UUID` varchar(32) NOT NULL," + // This creates the different colums you will save data too. varchar(32) Is a string, int = integer
-            "`Miner_Level` INTEGER NOT NULL," +
-            "`Miner_EXP` INTEGER NOT NULL," +
-            "`WoodCutter_Level` INTEGER NOT NULL," +
-            "`WoodCutter_EXP` INTEGER NOT NULL," +
-            "`Builder_Level` INTEGER NOT NULL," +
-            "`Builder_EXP` INTEGER NOT NULL," +
-            "`Selected_Job` text NOT NULL," +
-            "PRIMARY KEY (`UUID`)" +  // This is creating 3 colums Player, Kills, Total. Primary key is what you are going to use as your indexer. Here we want to use player so
-            ");"; // we can search by player, and get kills and total. If you some how were searching kills it would provide total and player.
+    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS Prace (" +
+            "`UUID` varchar(32) NOT NULL DEFAULT ''," +
+            "`MinerLevel` INTEGER NOT NULL DEFAULT 0," +
+            "`MinerEXP` INTEGER NOT NULL DEFAULT 0," +
+            "`WoodCutterLevel` INTEGER NOT NULL DEFAULT 0," +
+            "`WoodCutterEXP` INTEGER NOT NULL DEFAULT 0," +
+            "`BuilderLevel` INTEGER NOT NULL DEFAULT 0," +
+            "`BuilderEXP` INTEGER NOT NULL DEFAULT 0," +
+            "`SelectedJob` text NOT NULL DEFAULT ''," +
+            "PRIMARY KEY (`UUID`)" +
+            ");";
 
 
     // SQL creation stuff, You can leave the blow stuff untouched.

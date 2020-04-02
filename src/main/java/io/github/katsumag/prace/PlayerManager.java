@@ -74,6 +74,7 @@ public class PlayerManager {
     public void addEXP(UUID player, double amount, String job){
 
         System.out.println("here");
+        System.out.println("amount = " + amount);
 
         if (job.equalsIgnoreCase("Miner")){
             System.out.println("miner");

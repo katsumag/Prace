@@ -51,6 +51,7 @@ public class Selector implements Listener {
         ItemStack item = e.getClickedInventory().getItem(e.getSlot());
 
         if (item.isSimilar(BUILDER_HEAD)){
+
             //Bukkit.broadcastMessage("BUILDER");
             //Builder
             main.getDataBase().setCurrentJob(e.getWhoClicked().getUniqueId(), "Builder");

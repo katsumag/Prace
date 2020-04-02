@@ -26,3 +26,4 @@ io\github\katsumag\prace\misc\Reflections$FieldAccessor.class
 io\github\katsumag\prace\GUI\JobHolder.class
 io\github\katsumag\prace\misc\Reflections.class
 io\github\katsumag\prace\Jobs\Builder.class
+io\github\katsumag\prace\SQL\NewSQLite.class

@@ -7,7 +7,6 @@ import io.github.katsumag.prace.Jobs.WoodCutter;
 import io.github.katsumag.prace.SQL.Database;
 import io.github.katsumag.prace.SQL.Errors;
 import io.github.katsumag.prace.SQL.SQLite;
-import io.github.katsumag.prace.misc.TextUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -26,7 +25,6 @@ public final class Prace extends JavaPlugin {
 
     public static Database db;
     private  PlayerManager manager;
-    public static String BarTime = "5:00";
     public static int Time = 300;
     private static Economy econ;
 
@@ -72,16 +70,15 @@ public final class Prace extends JavaPlugin {
             @Override
             public void run() {
 
-                if (Time <=0){
+                if (Time == 0){
                     Time = 300;
                 }
                 //System.out.println("Time = " + Time);
-
-                BarTime = TextUtils.secondsToString(Time);
                 //System.out.println("BarTime = " + BarTime);
                 Time--;
 
                     new BarManager().getBars().forEach((uuid, bossBar) -> {
+                        System.out.println("Time/300 = " + Time / 300);
                         bossBar.getBossBar().setProgress(Time / 300);
                     });
             }
