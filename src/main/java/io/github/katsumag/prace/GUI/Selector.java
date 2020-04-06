@@ -1,6 +1,8 @@
 package io.github.katsumag.prace.GUI;
 
+import io.github.katsumag.prace.Jobs.JobType;
 import io.github.katsumag.prace.Prace;
+import io.github.katsumag.prace.WrappedPlayer;
 import io.github.katsumag.prace.misc.ItemFactory;
 import io.github.katsumag.prace.misc.Skull;
 import org.bukkit.Bukkit;
@@ -49,12 +51,14 @@ public class Selector implements Listener {
         if (!(e.getSlot() >= 1) && e.getSlot() <= 3) return;
 
         ItemStack item = e.getClickedInventory().getItem(e.getSlot());
+        Player p = (Player) e.getWhoClicked();
+        WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
 
         if (item.isSimilar(BUILDER_HEAD)){
 
             //Bukkit.broadcastMessage("BUILDER");
             //Builder
-            main.getDataBase().setCurrentJob(e.getWhoClicked().getUniqueId(), "Builder");
+            player.setCurrentJob(JobType.BUILDER);
             ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "Builder"));
             ((Player) e.getWhoClicked()).closeInventory();
 
@@ -62,14 +66,14 @@ public class Selector implements Listener {
             if (item.isSimilar(LOG_HEAD)){
                 //Bukkit.broadcastMessage("WOODCUTTER");
                 //WoodCutter
-                main.getDataBase().setCurrentJob(e.getWhoClicked().getUniqueId(), "WoodCutter");
+                player.setCurrentJob(JobType.WOODCUTTER);
                 ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "WoodCutter"));
                 ((Player) e.getWhoClicked()).closeInventory();
 
             } else{
                 //Bukkit.broadcastMessage("MINER");
                 //Miner
-                main.getDataBase().setCurrentJob(e.getWhoClicked().getUniqueId(), "Miner");
+                player.setCurrentJob(JobType.MINER);
                 ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "Miner"));
                 ((Player) e.getWhoClicked()).closeInventory();
 

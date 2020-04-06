@@ -1,6 +1,7 @@
 package io.github.katsumag.prace.Jobs;
 
 import io.github.katsumag.prace.Prace;
+import io.github.katsumag.prace.WrappedPlayer;
 import io.github.katsumag.prace.misc.WoodType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,9 +32,10 @@ public class WoodCutter implements Listener {
 
                     for (WoodType type : WoodType.values()) {
                         if(type.getItem().isSimilar(new ItemStack(e.getBlock().getType(), 1, e.getBlock().getData()))){
-                            int level = main.getDataBase().getWoodCutterLevel(p.getUniqueId());
+                            WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
+                            int level = player.getLevel(JobType.WOODCUTTER);
                             double multiplier = level * 0.01;
-                            main.getPlayerManager().addEXP(p.getUniqueId(), 1, "WoodCutter");
+                            player.setEXP(player.getEXP(JobType.WOODCUTTER) + 1, JobType.WOODCUTTER);
                             main.getPlayerManager().addMoney(p.getUniqueId(), 0.02 + multiplier);
                         }
                     }

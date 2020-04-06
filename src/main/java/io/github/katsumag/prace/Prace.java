@@ -4,9 +4,7 @@ import io.github.katsumag.prace.GUI.Selector;
 import io.github.katsumag.prace.Jobs.Builder;
 import io.github.katsumag.prace.Jobs.Miner;
 import io.github.katsumag.prace.Jobs.WoodCutter;
-import io.github.katsumag.prace.SQL.Database;
-import io.github.katsumag.prace.SQL.Errors;
-import io.github.katsumag.prace.SQL.SQLite;
+import io.github.katsumag.prace.SQL.NewSQLite;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -17,25 +15,40 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 
 public final class Prace extends JavaPlugin {
 
-    public static Database db;
+    public static Connection con;
+    public static NewSQLite database;
     private  PlayerManager manager;
     public static int Time = 300;
     private static Economy econ;
+    private static Prace instance;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
 
+        instance = this;
+
         getDataFolder().mkdir();
 
-        this.db = new SQLite(this);
-        this.db.load();
+        this.database = new NewSQLite(this, "Prace.db");
+        this.database.load();
+
+
+        try {
+            PreparedStatement ps = this.con.prepareStatement("SELECT sqlite_version()");
+            ResultSet rs = ps.executeQuery();
+            System.out.println("rs.getString(1) = " + rs.getString(1));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         Bukkit.getServer().getPluginManager().registerEvents(new Miner(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new WoodCutter(this), this);
@@ -45,16 +58,16 @@ public final class Prace extends JavaPlugin {
 
         try {
 
-            ResultSet set = getDataBase().getSQLConnection().prepareStatement("SELECT UUID FROM Prace;").executeQuery();
+            ResultSet set = this.con.prepareStatement("SELECT UUID FROM Prace;").executeQuery();
 
             for (String uuid : getStringList(set, "UUID")) {
                 Player p = Bukkit.getPlayer(uuid);
-                p.setMetadata("Job", new FixedMetadataValue(this, getDataBase().getCurrentJob(UUID.fromString(uuid))));
+                WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
+                p.setMetadata("Job", new FixedMetadataValue(this, player.getCurrentJob().getName()));
             }
 
 
         } catch (SQLException e) {
-            Errors.sqlConnectionExecute();
             e.printStackTrace();
         }
 
@@ -91,11 +104,15 @@ public final class Prace extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        getDataBase().shutdown(getDataBase().getSQLConnection());
+        try {
+            getDataBase().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Database getDataBase(){
-        return this.db;
+    public Connection getDataBase(){
+        return this.con;
     }
 
     public String[] getStringList(ResultSet rs, String column){
@@ -140,4 +157,9 @@ public final class Prace extends JavaPlugin {
 
         return true;
     }
+
+    public static Prace get(){
+        return Prace.instance;
+    }
+
 }

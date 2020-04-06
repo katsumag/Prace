@@ -1,6 +1,7 @@
 package io.github.katsumag.prace.Jobs;
 
 import io.github.katsumag.prace.Prace;
+import io.github.katsumag.prace.WrappedPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,9 +27,10 @@ public class Miner implements Listener {
         for (MetadataValue value : values) {
             if (value.getOwningPlugin() instanceof Prace){
                 if (value.asString().equalsIgnoreCase("Miner")){
-                    int level = main.getDataBase().getMinerLevel(p.getUniqueId());
+                    WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
+                    int level = player.getLevel(JobType.MINER);
                     double multiplier = level * 0.01;
-                    main.getPlayerManager().addEXP(p.getUniqueId(), 1, "Miner");
+                    player.setEXP(player.getEXP(JobType.MINER) + 1, JobType.MINER);
                     main.getPlayerManager().addMoney(p.getUniqueId(), 0.05 + multiplier);
                 }
 
@@ -36,5 +38,4 @@ public class Miner implements Listener {
         }
 
     }
-
 }
