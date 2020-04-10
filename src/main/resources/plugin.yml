@@ -1,5 +1,5 @@
 name: Prace
-version: ${project.version}
+version: 1.0
 main: io.github.katsumag.prace.Prace
 api-version: 1.13
 author: katsumag

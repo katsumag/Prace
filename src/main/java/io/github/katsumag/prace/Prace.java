@@ -32,23 +32,28 @@ public final class Prace extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-
+        System.out.println("1");
+        System.out.println("Hi Java please, please work for me");
+        getLogger().severe("CHEESE");
         instance = this;
-
-        getDataFolder().mkdir();
-
-        this.database = new NewSQLite(this, "Prace.db");
-        this.database.load();
-
-
+        System.out.println("2");
+        System.out.println("getDataFolder() = " + getDataFolder());
+        getDataFolder().mkdirs();
+        database = new NewSQLite(this, "Prace.db");
+        database.load();
+        con = database.getConnection().get();
+        System.out.println("5");
         try {
-            PreparedStatement ps = this.con.prepareStatement("SELECT sqlite_version()");
+            PreparedStatement ps = con.prepareStatement("SELECT sqlite_version()");
+            System.out.println("6");
             ResultSet rs = ps.executeQuery();
+            System.out.println("7");
             System.out.println("rs.getString(1) = " + rs.getString(1));
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("DONE");
 
         Bukkit.getServer().getPluginManager().registerEvents(new Miner(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new WoodCutter(this), this);
@@ -58,7 +63,7 @@ public final class Prace extends JavaPlugin {
 
         try {
 
-            ResultSet set = this.con.prepareStatement("SELECT UUID FROM Prace;").executeQuery();
+            ResultSet set = con.prepareStatement("SELECT `UUID` FROM `Prace`;").executeQuery();
 
             for (String uuid : getStringList(set, "UUID")) {
                 Player p = Bukkit.getPlayer(uuid);
@@ -112,7 +117,7 @@ public final class Prace extends JavaPlugin {
     }
 
     public Connection getDataBase(){
-        return this.con;
+        return con;
     }
 
     public String[] getStringList(ResultSet rs, String column){

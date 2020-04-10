@@ -18,7 +18,7 @@ public final class NewSQLite
 
     private final File file;
     private final AtomicReference<Connection> conn = new AtomicReference<>();
-    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS Prace (" +
+    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS `Prace` (" +
             "`UUID` varchar(32) NOT NULL DEFAULT ''," +
             "`minerLevel` INTEGER NOT NULL DEFAULT 0," +
             "`minerEXP` INTEGER NOT NULL DEFAULT 0," +
@@ -41,10 +41,11 @@ public final class NewSQLite
     {
         try
         {
+            System.out.println("file.getAbsolutePath() = " + file.getAbsolutePath());
             file.getParentFile().mkdirs();
             file.createNewFile();
 
-            Class.forName("org.sqlite.JDBC");
+            Class.forName("io.github.katsumag.prace.shaded.org.xerial.sqlite.JDBC");
             conn.set(DriverManager.getConnection(String.format("jdbc:sqlite:%s", file)));
 
             if (getConnection().isPresent()){
@@ -57,7 +58,7 @@ public final class NewSQLite
             }
 
         }
-        catch (final SQLException | ClassNotFoundException | IOException ex)
+        catch (final SQLException | IOException | ClassNotFoundException ex)
         {
             ex.printStackTrace();
             kill();
@@ -77,8 +78,15 @@ public final class NewSQLite
     }
 
     public Optional<Connection> getConnection()
+
     {
-        return Optional.ofNullable(conn.get());
+        Optional<Connection> optionalConnection = Optional.ofNullable(conn.get());
+        if (optionalConnection.isPresent()){
+            return optionalConnection;
+        } else {
+            System.out.println("CONNECTION IS NULL");
+            return optionalConnection;
+        }
     }
 
 }

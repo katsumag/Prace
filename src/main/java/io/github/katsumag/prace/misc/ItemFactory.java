@@ -85,7 +85,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -117,7 +117,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -143,7 +143,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -169,7 +169,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -203,7 +203,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -233,7 +233,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -267,7 +267,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -297,7 +297,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -335,7 +335,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -371,7 +371,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -399,7 +399,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -441,7 +441,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      */
 
@@ -495,7 +495,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -547,7 +547,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -585,7 +585,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -637,7 +637,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -697,7 +697,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -749,7 +749,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -799,7 +799,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -837,7 +837,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -893,7 +893,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -949,7 +949,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return This com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return This ItemFactory instance
 
      *
 
@@ -1005,7 +1005,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return A clones com.swalbert.cosmetics.GUI.ItemFactory
+     * @return A clones ItemFactory
 
      */
 
@@ -1025,7 +1025,7 @@ public class ItemFactory implements Cloneable {
 
     /**
 
-     * Creates a new com.swalbert.cosmetics.GUI.ItemFactory builder with the given item as a base.
+     * Creates a new ItemFactory builder with the given item as a base.
 
      *
 
@@ -1033,7 +1033,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return The new com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return The new ItemFactory instance
 
      */
 
@@ -1055,7 +1055,7 @@ public class ItemFactory implements Cloneable {
 
     /**
 
-     * Creates a new com.swalbert.cosmetics.GUI.ItemFactory builder with the given material as a base.
+     * Creates a new ItemFactory builder with the given material as a base.
 
      *
 
@@ -1063,7 +1063,7 @@ public class ItemFactory implements Cloneable {
 
      *
 
-     * @return The new com.swalbert.cosmetics.GUI.ItemFactory instance
+     * @return The new ItemFactory instance
 
      */
 
