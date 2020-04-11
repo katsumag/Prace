@@ -25,35 +25,28 @@ public final class Prace extends JavaPlugin {
     public static Connection con;
     public static NewSQLite database;
     private  PlayerManager manager;
-    public static int Time = 300;
+    public static double Time = 300;
     private static Economy econ;
     private static Prace instance;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        System.out.println("1");
-        System.out.println("Hi Java please, please work for me");
-        getLogger().severe("CHEESE");
         instance = this;
-        System.out.println("2");
-        System.out.println("getDataFolder() = " + getDataFolder());
+
         getDataFolder().mkdirs();
         database = new NewSQLite(this, "Prace.db");
         database.load();
         con = database.getConnection().get();
-        System.out.println("5");
+
         try {
             PreparedStatement ps = con.prepareStatement("SELECT sqlite_version()");
-            System.out.println("6");
             ResultSet rs = ps.executeQuery();
-            System.out.println("7");
             System.out.println("rs.getString(1) = " + rs.getString(1));
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("DONE");
 
         Bukkit.getServer().getPluginManager().registerEvents(new Miner(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new WoodCutter(this), this);
@@ -84,25 +77,24 @@ public final class Prace extends JavaPlugin {
          manager = new PlayerManager(this);
 
 
-        BukkitRunnable task = new BukkitRunnable() {
+
+
+        Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BukkitRunnable() {
             @Override
             public void run() {
 
                 if (Time == 0){
                     Time = 300;
                 }
-                //System.out.println("Time = " + Time);
-                //System.out.println("BarTime = " + BarTime);
+
                 Time--;
 
-                    new BarManager().getBars().forEach((uuid, bossBar) -> {
-                        System.out.println("Time/300 = " + Time / 300);
-                        bossBar.getBossBar().setProgress(Time / 300);
-                    });
+                new BarManager().getBars().forEach((uuid, bossBar) -> {
+                    //System.out.println("Time/300 = " + Time / 300);
+                    bossBar.setProgress(Time / 300);
+                });
             }
-        };
-
-        Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, task, 20, 20);
+        }, 20, 20);
 
     }
 
@@ -166,5 +158,4 @@ public final class Prace extends JavaPlugin {
     public static Prace get(){
         return Prace.instance;
     }
-
 }

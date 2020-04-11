@@ -1,6 +1,9 @@
 package io.github.katsumag.prace;
 
 import io.github.katsumag.prace.Jobs.JobType;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +14,7 @@ import java.util.UUID;
 public class WrappedPlayer {
 
     private static HashMap<UUID, WrappedPlayer> wrappedPlayers = new HashMap<>();
+    private BarManager manager = new BarManager();
 
     private UUID player;
     private Prace main = Prace.get();
@@ -303,6 +307,8 @@ public class WrappedPlayer {
             }
         }
 
+        updateBar(type);
+
     }
 
     public int getEXP(JobType type){
@@ -352,6 +358,16 @@ public class WrappedPlayer {
         }
 
         return 0;
+    }
+
+    private void updateBar(JobType type){
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(getEXP(type));
+        builder.append(" / ");
+        builder.append((getLevel(type) * 200)+ 400);
+
+        Bukkit.getPlayer(this.player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(builder.toString()));
     }
 
 }

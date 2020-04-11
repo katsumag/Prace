@@ -1,5 +1,6 @@
 package io.github.katsumag.prace.GUI;
 
+import io.github.katsumag.prace.BarManager;
 import io.github.katsumag.prace.Jobs.JobType;
 import io.github.katsumag.prace.Prace;
 import io.github.katsumag.prace.WrappedPlayer;
@@ -7,6 +8,8 @@ import io.github.katsumag.prace.misc.ItemFactory;
 import io.github.katsumag.prace.misc.Skull;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +22,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class Selector implements Listener {
 
     private Prace main;
+    private BarManager manager = new BarManager();
     public static final ItemStack BUILDER_HEAD = ItemFactory.builder(Skull.getCustomSkull("http://textures.minecraft.net/texture/dcb7a15eda1cbe47a8d5d7f780e89bbc35e0c177fcb9c6480a11b02cc8165c1c")).setDisplayName("Builder").build();
     public static final ItemStack LOG_HEAD = ItemFactory.builder(Skull.getCustomSkull("http://textures.minecraft.net/texture/dc1754851e367e8beba2a6d8f7c2fede87ae793ac546b0f299d673215b293")).setDisplayName("WoodCutter").build();
     public static final ItemStack COBBLE_HEAD = ItemFactory.builder(Skull.getCustomSkull("http://textures.minecraft.net/texture/6d2e310879a6450af5625bcd45093dd7e5d8f827ccbfeac69c81537768406b")).setDisplayName("Miner").build();
@@ -78,6 +82,10 @@ public class Selector implements Listener {
                 ((Player) e.getWhoClicked()).closeInventory();
 
             }
+        }
+
+        if (! manager.hasBar(p.getUniqueId())){
+            manager.createBar(p.getUniqueId(), "", BarColor.BLUE, BarStyle.SEGMENTED_20);
         }
 
     }
