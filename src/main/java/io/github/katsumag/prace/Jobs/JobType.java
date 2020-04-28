@@ -4,7 +4,8 @@ public enum JobType {
 
     MINER("Miner"),
     BUILDER("Builder"),
-    WOODCUTTER("WoodCutter");
+    WOODCUTTER("WoodCutter"),
+    NONE("None");
 
     String name;
 

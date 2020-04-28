@@ -4,38 +4,44 @@ import io.github.katsumag.prace.Jobs.JobType;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class WrappedPlayer {
 
     private static HashMap<UUID, WrappedPlayer> wrappedPlayers = new HashMap<>();
-    private BarManager manager = new BarManager();
+    private final BarManager manager = new BarManager();
+    private static HashMap<UUID, String> jobs = new HashMap<>();
 
-    private UUID player;
-    private Prace main = Prace.get();
+    private final UUID player;
+    private final Prace main = Prace.get();
 
-    public WrappedPlayer(UUID player){
+    public WrappedPlayer(UUID player) {
         this.player = player;
         wrappedPlayers.put(player, this);
+        jobs.put(player, "None");
     }
-
 
 
     public UUID getPlayer() {
         return player;
     }
 
-    public boolean isInDb(){
+    public boolean isInDb() {
 
-        try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT * FROM `Prace` WHERE `UUID`=?")){
+        try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT * FROM `Prace` WHERE `UUID`=?")) {
             ps.setString(1, this.player.toString());
             ResultSet rs = ps.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 return true;
             }
         } catch (SQLException e) {
@@ -45,19 +51,19 @@ public class WrappedPlayer {
     }
 
 
-    public static boolean isWrapped(UUID id){
+    public static boolean isWrapped(UUID id) {
 
         for (UUID uuid : wrappedPlayers.keySet()) {
-            if (uuid == id){
+            if (uuid == id) {
                 return true;
             }
         }
         return false;
     }
 
-    public static WrappedPlayer getWrappedPlayer(UUID id){
+    public static WrappedPlayer getWrappedPlayer(UUID id) {
 
-        if (isWrapped(id)){
+        if (isWrapped(id)) {
             return wrappedPlayers.get(id);
         }
 
@@ -65,161 +71,182 @@ public class WrappedPlayer {
 
     }
 
-    public void setCurrentJob(JobType type){
+    public void setCurrentJob(JobType type) {
 
-        if (isInDb()){
-            try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `selectedJob`=? WHERE `UUID`=?")){
-                ps.setString(1, type.getName());
-                ps.setString(2, this.player.toString());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else{
-            try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `selectedJob`) VALUES(?, ?)")){
-                ps.setString(1, this.player.toString());
-                ps.setString(2, type.getName());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    public JobType getCurrentJob(){
-
-        try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT `selectedJob` FROM `Prace` WHERE `UUID`=?")){
-            ps.setString(1, this.player.toString());
-
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()){
-                    return JobType.fromString(rs.getString("selectedJob"));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+            if (isInDb()) {
+                try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `selectedJob`=? WHERE `UUID`=?")) {
+                    ps.setString(1, type.getName());
+                    ps.setString(2, player.toString());
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `selectedJob`) VALUES(?, ?)")) {
+                    ps.setString(1, player.toString());
+                    ps.setString(2, type.getName());
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            jobs.replace(player, type.getName());
 
-        return null;
+            }
+        }.runTaskAsynchronously(main);
+    }
+
+    public CompletableFuture<JobType> getCurrentJob() {
+
+        CompletableFuture<JobType> future = new CompletableFuture<>();
+
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT `selectedJob` FROM `Prace` WHERE `UUID`=?")) {
+                    ps.setString(1, player.toString());
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            future.complete(JobType.fromString(rs.getString("selectedJob")));
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(main);
+        return future;
     }
 
     public void setLevel(int level, JobType type) {
 
-        if (isInDb()){
-            if (type == JobType.MINER){
-                try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `minerLevel`=? WHERE `UUID`=?;")){
+        new BukkitRunnable() {
 
-                    ps.setInt(1, level);
-                    ps.setString(2, this.player.toString());
-                    ps.executeUpdate();
+            @Override
+            public void run() {
+                if (isInDb()) {
+                    if (type == JobType.MINER) {
+                        try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `minerLevel`=? WHERE `UUID`=?;")) {
 
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                            ps.setInt(1, level);
+                            ps.setString(2, player.toString());
+                            ps.executeUpdate();
 
-            } else {
-                if (type == JobType.BUILDER){
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
 
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `builderLevel`=? WHERE `UUID`=?;")){
+                    } else {
+                        if (type == JobType.BUILDER) {
 
-                        ps.setInt(1, level);
-                        ps.setString(2, this.player.toString());
-                        ps.executeUpdate();
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `builderLevel`=? WHERE `UUID`=?;")) {
 
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+                                ps.setInt(1, level);
+                                ps.setString(2, player.toString());
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `woodCutterLevel`=? WHERE `UUID`=?;");) {
+
+                                ps.setInt(1, level);
+                                ps.setString(2, player.toString());
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
-                } else{
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `woodCutterLevel`=? WHERE `UUID`=?;");) {
+                } else {
+                    if (type == JobType.MINER) {
+                        try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `minerLevel`) VALUES(?, ?);")) {
 
-                        ps.setInt(1, level);
-                        ps.setString(2, this.player.toString());
-                        ps.executeUpdate();
+                            ps.setString(1, player.toString());
+                            ps.setInt(2, level);
+                            ps.executeUpdate();
 
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        if (type == JobType.BUILDER) {
+
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `builderLevel`) VALUES(?, ?);")) {
+
+                                ps.setString(1, player.toString());
+                                ps.setInt(2, level);
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `woodCutterLevel`) VALUES(?, ?);");) {
+
+                                ps.setString(1, player.toString());
+                                ps.setInt(2, level);
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             }
-        } else {
-            if (type == JobType.MINER){
-                try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `minerLevel`) VALUES(?, ?);")){
+        }.runTaskAsynchronously(main);
 
-                    ps.setString(1, this.player.toString());
-                    ps.setInt(2, level);
-                    ps.executeUpdate();
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                if (type == JobType.BUILDER){
-
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `builderLevel`) VALUES(?, ?);")){
-
-                        ps.setString(1, this.player.toString());
-                        ps.setInt(2, level);
-                        ps.executeUpdate();
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                } else{
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `woodCutterLevel`) VALUES(?, ?);");) {
-
-                        ps.setString(1, this.player.toString());
-                        ps.setInt(2, level);
-                        ps.executeUpdate();
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
     }
 
-    public int getLevel(JobType type) {
+    public CompletableFuture<Integer> getLevel(JobType type) {
 
-        if (type == JobType.BUILDER){
+        CompletableFuture<Integer> future = new CompletableFuture<>();
 
-            try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT `builderLevel` FROM `Prace` WHERE `UUID`=?")){
+        if (type == JobType.BUILDER) {
+
+            try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT `builderLevel` FROM `Prace` WHERE `UUID`=?")) {
                 ps.setString(1, this.player.toString());
 
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()){
-                        return rs.getInt("builderLevel");
+                    if (rs.next()) {
+                        future.complete(rs.getInt("builderLevel"));
                     }
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        } else{
+        } else {
 
-            if (type == JobType.MINER){
+            if (type == JobType.MINER) {
 
                 try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT `minerLevel` FROM `Prace` WHERE `UUID`=?")) {
                     ps.setString(1, this.player.toString());
 
                     try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()){
-                            return rs.getInt("minerLevel");
+                        if (rs.next()) {
+                            future.complete(rs.getInt("minerLevel"));
                         }
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            } else{
+            } else {
 
                 try (PreparedStatement ps = main.getDataBase().prepareStatement("SELECT `woodCutterLevel` FROM `Prace` WHERE `UUID`=?")) {
                     ps.setString(1, this.player.toString());
 
                     try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()){
-                            return rs.getInt("woodCutterLevel");
+                        if (rs.next()) {
+                            future.complete(rs.getInt("woodCutterLevel"));
                         }
                     }
                 } catch (SQLException e) {
@@ -228,90 +255,109 @@ public class WrappedPlayer {
             }
         }
 
-        return 0;
+        return future;
     }
 
     public void setEXP(int exp, JobType type) {
 
-        if (isInDb()){
-            if (type == JobType.MINER){
-                try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `minerEXP`=? WHERE `UUID`=?;")){
+        new BukkitRunnable() {
 
-                    ps.setInt(1, exp);
-                    ps.setString(2, this.player.toString());
-                    ps.executeUpdate();
+            @Override
+            public void run() {
+                if (isInDb()) {
+                    if (type == JobType.MINER) {
+                        try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `minerEXP`=? WHERE `UUID`=?;")) {
 
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                            ps.setInt(1, exp);
+                            ps.setString(2, player.toString());
+                            ps.executeUpdate();
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        if (type == JobType.BUILDER) {
+
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `builderEXP`=? WHERE `UUID`=?;")) {
+
+                                ps.setInt(1, exp);
+                                ps.setString(2, player.toString());
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `woodCutterEXP`=? WHERE `UUID`=?;");) {
+
+                                ps.setInt(1, exp);
+                                ps.setString(2, player.toString());
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } else {
+                    if (type == JobType.MINER) {
+                        try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `minerEXP`) VALUES(?, ?);")) {
+
+                            ps.setString(1, player.toString());
+                            ps.setInt(2, exp);
+                            ps.executeUpdate();
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        if (type == JobType.BUILDER) {
+
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `builderEXP`) VALUES(?, ?);")) {
+
+                                ps.setString(1, player.toString());
+                                ps.setInt(2, exp);
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `woodCutterEXP`) VALUES(?, ?);");) {
+
+                                ps.setString(1, player.toString());
+                                ps.setInt(2, exp);
+                                ps.executeUpdate();
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
 
-            } else {
-                if (type == JobType.BUILDER){
+                getLevel(type).thenAccept(level -> {
+                    getEXP(type).thenAccept(xp -> {
+                        if (xp >= (level*200)+ 400) {
+                            setLevel(level + 1, type);
+                            Player p = Bukkit.getPlayer(getPlayer());
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bEagle&7Craft&8] &e>> Udalo ci sie osiagnac nowy poziom. Obecny poziom wynosi &a%next-level%&e.").replaceAll("%next-level%", String.valueOf(level)));
+                            p.playSound(p.getLocation(), Sound.BLOCK_NOTE_HARP, 10, 60);
+                        }
+                    });
+                });
 
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `builderEXP`=? WHERE `UUID`=?;")){
+                updateBar(type);
 
-                        ps.setInt(1, exp);
-                        ps.setString(2, this.player.toString());
-                        ps.executeUpdate();
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                } else{
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("UPDATE `Prace` SET `woodCutterEXP`=? WHERE `UUID`=?;");) {
-
-                        ps.setInt(1, exp);
-                        ps.setString(2, this.player.toString());
-                        ps.executeUpdate();
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
-        } else {
-            if (type == JobType.MINER){
-                try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `minerEXP`) VALUES(?, ?);")){
-
-                    ps.setString(1, this.player.toString());
-                    ps.setInt(2, exp);
-                    ps.executeUpdate();
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                if (type == JobType.BUILDER){
-
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `builderEXP`) VALUES(?, ?);")){
-
-                        ps.setString(1, this.player.toString());
-                        ps.setInt(2, exp);
-                        ps.executeUpdate();
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                } else{
-                    try (PreparedStatement ps = main.getDataBase().prepareStatement("INSERT INTO `Prace` (`UUID`, `woodCutterEXP`) VALUES(?, ?);");) {
-
-                        ps.setString(1, this.player.toString());
-                        ps.setInt(2, exp);
-                        ps.executeUpdate();
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        updateBar(type);
-
+        }.runTaskAsynchronously(main);
     }
 
-    public int getEXP(JobType type){
+    public CompletableFuture<Integer> getEXP(JobType type){
+
+        CompletableFuture<Integer> future = new CompletableFuture<>();
 
         if (type == JobType.BUILDER){
 
@@ -320,7 +366,7 @@ public class WrappedPlayer {
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()){
-                        return rs.getInt("builderEXP");
+                        future.complete(rs.getInt("builderEXP"));
                     }
                 }
             } catch (SQLException e) {
@@ -335,7 +381,7 @@ public class WrappedPlayer {
 
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()){
-                            return rs.getInt("minerEXP");
+                            future.complete(rs.getInt("minerEXP"));
                         }
                     }
                 } catch (SQLException e) {
@@ -348,7 +394,7 @@ public class WrappedPlayer {
 
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()){
-                            return rs.getInt("woodCutterEXP");
+                            future.complete(rs.getInt("woodCutterEXP"));
                         }
                     }
                 } catch (SQLException e) {
@@ -357,17 +403,26 @@ public class WrappedPlayer {
             }
         }
 
-        return 0;
+        return future;
     }
 
     private void updateBar(JobType type){
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                StringBuilder builder = new StringBuilder();
+                builder.append("EXP: ");
+                builder.append(getEXP(type));
+                builder.append(" / ");
+                getLevel(type).thenAccept(type -> builder.append((type * 200) + 400));
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(getEXP(type));
-        builder.append(" / ");
-        builder.append((getLevel(type) * 200)+ 400);
+                Bukkit.getPlayer(player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(builder.toString()));
+            }
+        }.runTaskAsynchronously(main);
+    }
 
-        Bukkit.getPlayer(this.player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(builder.toString()));
+    public String getCachedJobName(){
+        return jobs.get(player);
     }
 
 }

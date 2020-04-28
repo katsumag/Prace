@@ -8,3 +8,6 @@ softdepend:
 commands:
   prace:
     description: Prace main GUI!
+
+depend:
+  - PlaceholderAPI

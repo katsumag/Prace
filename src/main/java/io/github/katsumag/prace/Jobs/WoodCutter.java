@@ -14,7 +14,7 @@ import java.util.List;
 
 public class WoodCutter implements Listener {
 
-    private Prace main;
+    private final Prace main;
 
     public WoodCutter(Prace main){
         this.main = main;
@@ -33,17 +33,18 @@ public class WoodCutter implements Listener {
                     for (WoodType type : WoodType.values()) {
                         if(type.getItem().isSimilar(new ItemStack(e.getBlock().getType(), 1, e.getBlock().getData()))){
                             WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
-                            int level = player.getLevel(JobType.WOODCUTTER);
-                            double multiplier = level * 0.01;
-                            player.setEXP(player.getEXP(JobType.WOODCUTTER) + 1, JobType.WOODCUTTER);
-                            main.getPlayerManager().addMoney(p.getUniqueId(), 0.02 + multiplier);
+
+                            player.getLevel(JobType.WOODCUTTER).thenAccept(level -> {
+                                double multiplier = level * 0.01;
+                                player.getEXP(JobType.WOODCUTTER).thenAccept(xp -> {
+                                    player.setEXP(xp + 1, JobType.WOODCUTTER);
+                                });
+                                main.getPlayerManager().addMoney(p.getUniqueId(), 0.02 + multiplier);
+                            });
                         }
                     }
                 }
-
             }
         }
-
     }
-
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Builder implements Listener {
 
-    private Prace main;
+    private final Prace main;
 
     public Builder(Prace main){
         this.main = main;
@@ -29,16 +29,16 @@ public class Builder implements Listener {
             if (value.getOwningPlugin() instanceof Prace){
                 if (value.asString().equalsIgnoreCase("Builder")){
                     WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
-                    int level = player.getLevel(JobType.BUILDER);
-                    double multiplier = level * 0.001;
-                    player.setEXP(player.getEXP(JobType.BUILDER) + 1, JobType.BUILDER);
-                    main.getPlayerManager().addMoney(p.getUniqueId(), 0.005 + multiplier);
 
+                    player.getLevel(JobType.BUILDER).thenAccept(level -> {
+                        double multiplier = level * 0.001;
+                        player.getEXP(JobType.BUILDER).thenAccept(xp -> {
+                            player.setEXP(xp + 1, JobType.BUILDER);
+                        });
+                        main.getPlayerManager().addMoney(p.getUniqueId(), 0.005 + multiplier);
+                    });
                 }
-
             }
         }
-
     }
-
 }

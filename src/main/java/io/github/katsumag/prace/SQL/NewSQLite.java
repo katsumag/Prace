@@ -41,7 +41,7 @@ public final class NewSQLite
     {
         try
         {
-            System.out.println("file.getAbsolutePath() = " + file.getAbsolutePath());
+            //System.out.println("file.getAbsolutePath() = " + file.getAbsolutePath());
             file.getParentFile().mkdirs();
             file.createNewFile();
 

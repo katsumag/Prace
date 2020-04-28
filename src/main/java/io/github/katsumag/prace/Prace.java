@@ -4,7 +4,10 @@ import io.github.katsumag.prace.GUI.Selector;
 import io.github.katsumag.prace.Jobs.Builder;
 import io.github.katsumag.prace.Jobs.Miner;
 import io.github.katsumag.prace.Jobs.WoodCutter;
+import io.github.katsumag.prace.PAPI.jobPlaceholder;
+import io.github.katsumag.prace.PAPI.payoutPlaceholder;
 import io.github.katsumag.prace.SQL.NewSQLite;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -42,7 +45,7 @@ public final class Prace extends JavaPlugin {
         try {
             PreparedStatement ps = con.prepareStatement("SELECT sqlite_version()");
             ResultSet rs = ps.executeQuery();
-            System.out.println("rs.getString(1) = " + rs.getString(1));
+            //System.out.println("rs.getString(1) = " + rs.getString(1));
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,6 +56,8 @@ public final class Prace extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new Builder(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new Selector(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new BarManager(), this);
+        PlaceholderAPI.registerExpansion(new jobPlaceholder());
+        PlaceholderAPI.registerExpansion(new payoutPlaceholder(this));
 
         try {
 
@@ -61,12 +66,12 @@ public final class Prace extends JavaPlugin {
             for (String uuid : getStringList(set, "UUID")) {
                 Player p = Bukkit.getPlayer(uuid);
                 WrappedPlayer player = WrappedPlayer.getWrappedPlayer(p.getUniqueId());
-                p.setMetadata("Job", new FixedMetadataValue(this, player.getCurrentJob().getName()));
+                p.setMetadata("Job", new FixedMetadataValue(this, player.getCachedJobName()));
             }
 
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         //VAULT LOAD ---------------------------------------------------------------------------------------------------
@@ -90,7 +95,6 @@ public final class Prace extends JavaPlugin {
                 Time--;
 
                 new BarManager().getBars().forEach((uuid, bossBar) -> {
-                    //System.out.println("Time/300 = " + Time / 300);
                     bossBar.setProgress(Time / 300);
                 });
             }
@@ -116,7 +120,7 @@ public final class Prace extends JavaPlugin {
         try {
             return (String[]) rs.getArray(column).getArray();
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return new String[0];
     }
