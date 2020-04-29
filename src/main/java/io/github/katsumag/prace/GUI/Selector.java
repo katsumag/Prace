@@ -8,7 +8,6 @@ import io.github.katsumag.prace.misc.ItemFactory;
 import io.github.katsumag.prace.misc.Skull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
@@ -48,8 +47,7 @@ public class Selector implements Listener {
 
         inventory = Bukkit.createInventory(new JobHolder(main), InventoryType.HOPPER, "Prace");
 
-        ItemStack stack = new ItemStack(Material.STAINED_GLASS_PANE);
-        inventory.setItem(0, stack);
+        inventory.setItem(0, CLEAR_HEAD);
         inventory.setItem(1, COBBLE_HEAD);
         inventory.setItem(2, LOG_HEAD);
         inventory.setItem(3, BUILDER_HEAD);
@@ -63,8 +61,6 @@ public class Selector implements Listener {
         if (e.getClickedInventory() == null) return;
 
         if (!(e.getClickedInventory().getHolder() instanceof JobHolder)) return;
-
-        if (e.getSlot() == 0) return;
 
         ItemStack item = e.getClickedInventory().getItem(e.getSlot());
         Player p = (Player) e.getWhoClicked();
