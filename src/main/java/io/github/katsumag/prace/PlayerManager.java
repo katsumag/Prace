@@ -6,12 +6,13 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
 
-    private static final ConcurrentHashMap<UUID, Double> money = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, BigDecimal> money = new ConcurrentHashMap<>();
     private BukkitRunnable task = new BukkitRunnable(){
         @Override
         public void run() {
@@ -23,14 +24,14 @@ public class PlayerManager {
                 //System.out.println("aDouble = " + aDouble);
 
                 if (Prace.getEconomy().hasAccount(Bukkit.getOfflinePlayer(uuid))){
-                    Prace.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(uuid), aDouble);
+                    Prace.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(uuid), aDouble.doubleValue());
                 } else {
                     Prace.getEconomy().createPlayerAccount(Bukkit.getOfflinePlayer(uuid));
-                    Prace.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(uuid), aDouble);
+                    Prace.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(uuid), aDouble.doubleValue());
                 }
 
                 Player p = Bukkit.getPlayer(uuid);
-                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_HARP, 10, 60);
+                p.playSound(p.getLocation(), Sound.BLOCK_NOTE_HARP, 200, 60);
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bEagle&7Craft&8] &e>> Twoja nagroda za prace wynosi &a%money%$&e.").replaceAll("%money%", String.valueOf(aDouble)));
                 money.remove(uuid);
 
@@ -51,21 +52,21 @@ public class PlayerManager {
     }
 
     public double getMoney(UUID player){
-        return (hasMoney(player) ? money.get(player) : 0);
+        return (hasMoney(player) ? money.get(player).doubleValue() : 0);
     }
 
     public void addMoney(UUID player, double amount){
         if (hasMoney(player)){
-            money.replace(player, money.get(player) + amount);
+            money.replace(player, BigDecimal.valueOf(money.get(player).doubleValue() + amount));
         } else {
-            money.put(player, amount);
+            money.put(player, BigDecimal.valueOf(amount));
         }
     }
 
     public void setMoney(UUID player, double amount){
         if (hasMoney(player)){
-            money.replace(player, amount);
-        } else money.put(player, amount);
+            money.replace(player, BigDecimal.valueOf(amount));
+        } else money.put(player, BigDecimal.valueOf(amount));
     }
 
 }

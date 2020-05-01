@@ -377,7 +377,7 @@ public class WrappedPlayer {
                             setLevel(level + 1, type);
                             Player p = Bukkit.getPlayer(getPlayer());
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bEagle&7Craft&8] &e>> Udalo ci sie osiagnac nowy poziom. Obecny poziom wynosi &a%next-level%&e.").replaceAll("%next-level%", String.valueOf(level)));
-                            p.playSound(p.getLocation(), Sound.BLOCK_NOTE_HARP, 10, 60);
+                            p.playSound(p.getLocation(), Sound.BLOCK_NOTE_HARP, 200, 60);
                         }
                     });
                 });
@@ -457,18 +457,18 @@ public class WrappedPlayer {
     }
 
     private void updateBar(JobType type){
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                StringBuilder builder = new StringBuilder();
-                builder.append("EXP: ");
-                getEXP(type).thenAccept(builder::append);
-                builder.append(" / ");
-                getLevel(type).thenAccept(level -> builder.append((level * 200) + 400));
 
-                Bukkit.getPlayer(player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(builder.toString()));
-            }
-        }.runTaskAsynchronously(main);
+        getEXP(type).thenAccept(xp -> {
+           getLevel(type).thenAccept(level -> {
+               StringBuilder builder = new StringBuilder();
+               builder.append("EXP: ");
+               builder.append((level > 1) ? (xp - ((level-1) *400) + 400) : xp);
+               builder.append(" / ");
+               builder.append((level > 1) ? 200 : 400);
+
+               Bukkit.getPlayer(player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(builder.toString()));
+           });
+        });
     }
 
     public String getCachedJobName(){

@@ -1,5 +1,6 @@
 package io.github.katsumag.prace;
 
+import io.github.katsumag.prace.Events.registerOnJoin;
 import io.github.katsumag.prace.GUI.Selector;
 import io.github.katsumag.prace.Jobs.Builder;
 import io.github.katsumag.prace.Jobs.Miner;
@@ -56,6 +57,7 @@ public final class Prace extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new Builder(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new Selector(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new BarManager(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new registerOnJoin(), this);
         PlaceholderAPI.registerExpansion(new jobPlaceholder());
         PlaceholderAPI.registerExpansion(new payoutPlaceholder(this));
 
@@ -162,4 +164,19 @@ public final class Prace extends JavaPlugin {
     public static Prace get(){
         return Prace.instance;
     }
+
+    public String translate(String str){
+        switch (str.toLowerCase()){
+            case "builder":
+                return "Budowniczy";
+            case "woodcutter":
+                return "Drwal";
+            case "miner":
+                return "Gornik";
+            case "none":
+                return "Brak";
+        }
+        return "";
+    }
+
 }
