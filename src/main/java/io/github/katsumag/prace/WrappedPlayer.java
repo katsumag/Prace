@@ -20,7 +20,7 @@ public class WrappedPlayer {
 
     private static HashMap<UUID, WrappedPlayer> wrappedPlayers = new HashMap<>();
     private final BarManager manager = new BarManager();
-    private String job;
+    private String job = "NONE";
     private HashMap<JobType, Integer> levels = new HashMap<>();
     private HashMap<JobType, Integer> xp = new HashMap<>();
 
@@ -115,7 +115,7 @@ public class WrappedPlayer {
             @Override
             public void run() {
 
-                if (!(job == null)) {
+                if (job != null) {
                     future.complete(JobType.fromString(job));
                 }
 

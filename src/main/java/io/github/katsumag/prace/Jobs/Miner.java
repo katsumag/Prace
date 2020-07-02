@@ -23,7 +23,7 @@ public class Miner implements Listener {
     public void onBlockMine(BlockBreakEvent e){
         Player p = e.getPlayer();
         if (! p.hasMetadata("Job")) return;
-        if (e.getBlock().getType() != Material.COBBLESTONE || e.getBlock().getType() != Material.STONE){
+        if (e.getBlock().getType() != Material.COBBLESTONE && e.getBlock().getType() != Material.STONE){
             return;
         }
 

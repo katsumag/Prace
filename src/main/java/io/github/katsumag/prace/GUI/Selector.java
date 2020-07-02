@@ -28,11 +28,11 @@ public class Selector implements Listener {
             .setLore(ChatColor.translateAlternateColorCodes('&', "&7Otrzymujesz pieniadze za"), ChatColor.translateAlternateColorCodes('&', "&7stawianie blokow."))
             .build();
     public static final ItemStack LOG_HEAD = ItemFactory.builder(Skull.getCustomSkull("http://textures.minecraft.net/texture/dc1754851e367e8beba2a6d8f7c2fede87ae793ac546b0f299d673215b293"))
-            .setDisplayName("§6Gornik")
+            .setDisplayName("§6Drwal")
             .setLore(ChatColor.translateAlternateColorCodes('&', "&7Otrzymujesz pieniadze za"), ChatColor.translateAlternateColorCodes('&', "&7niszczenie kamienia i bruku."))
             .build();
     public static final ItemStack COBBLE_HEAD = ItemFactory.builder(Skull.getCustomSkull("http://textures.minecraft.net/texture/6d2e310879a6450af5625bcd45093dd7e5d8f827ccbfeac69c81537768406b"))
-            .setDisplayName("§6Drwal")
+            .setDisplayName("§6Gornik")
             .setLore(ChatColor.translateAlternateColorCodes('&', "&7Otrzymujesz pieniadze za"), ChatColor.translateAlternateColorCodes('&', "&7scinanie drzew."))
             .build();
     public static final ItemStack CLEAR_HEAD = ItemFactory.builder(Skull.getCustomSkull("http://textures.minecraft.net/texture/beb588b21a6f98ad1ff4e085c552dcb050efc9cab427f46048f18fc803475f7"))
@@ -59,7 +59,6 @@ public class Selector implements Listener {
     public void onClick(InventoryClickEvent e){
 
         if (e.getClickedInventory() == null) return;
-
         if (!(e.getClickedInventory().getHolder() instanceof JobHolder)) return;
 
         ItemStack item = e.getClickedInventory().getItem(e.getSlot());
@@ -71,28 +70,28 @@ public class Selector implements Listener {
             //Bukkit.broadcastMessage("BUILDER");
             //Builder
             player.setCurrentJob(JobType.BUILDER);
-            ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "Builder"));
-            ((Player) e.getWhoClicked()).closeInventory();
+            e.getWhoClicked().setMetadata("Job", new FixedMetadataValue(main, "Builder"));
+            e.getWhoClicked().closeInventory();
 
         } else{
             if (item.isSimilar(LOG_HEAD)){
                 //Bukkit.broadcastMessage("WOODCUTTER");
                 //WoodCutter
                 player.setCurrentJob(JobType.WOODCUTTER);
-                ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "WoodCutter"));
-                ((Player) e.getWhoClicked()).closeInventory();
+                e.getWhoClicked().setMetadata("Job", new FixedMetadataValue(main, "WoodCutter"));
+                e.getWhoClicked().closeInventory();
 
             } else{
                 if (item.isSimilar(COBBLE_HEAD)){
                     //Bukkit.broadcastMessage("MINER");
                     //Miner
                     player.setCurrentJob(JobType.MINER);
-                    ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "Miner"));
-                    ((Player) e.getWhoClicked()).closeInventory();
+                    e.getWhoClicked().setMetadata("Job", new FixedMetadataValue(main, "Miner"));
+                    e.getWhoClicked().closeInventory();
                 } else {
                     player.setCurrentJob(JobType.NONE);
-                    ((Player) e.getWhoClicked()).setMetadata("Job", new FixedMetadataValue(main, "None"));
-                    ((Player) e.getWhoClicked()).closeInventory();
+                    e.getWhoClicked().setMetadata("Job", new FixedMetadataValue(main, "None"));
+                    e.getWhoClicked().closeInventory();
                     manager.getBar(p.getUniqueId()).removePlayer(p);
                 }
             }

@@ -18,18 +18,18 @@ public enum JobType {
     }
 
     public static JobType fromString(String string){
-        if (string.equalsIgnoreCase("Miner")){
-            return MINER;
-        } else {
-            if (string.equalsIgnoreCase("Builder")){
+
+        switch (string.toLowerCase()) {
+            case "miner":
+                return MINER;
+            case "builder":
                 return BUILDER;
-            } else{
-                if (string.equalsIgnoreCase("WoodCutter")){
-                    return WOODCUTTER;
-                } else{
-                    return null;
-                }
-            }
+            case "woodcutter":
+                return WOODCUTTER;
+            case "none":
+                return NONE;
+            default:
+                return null;
         }
     }
 

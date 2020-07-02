@@ -59,7 +59,7 @@ public final class Prace extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new BarManager(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new registerOnJoin(), this);
         PlaceholderAPI.registerExpansion(new jobPlaceholder());
-        PlaceholderAPI.registerExpansion(new payoutPlaceholder(this));
+        PlaceholderAPI.registerExpansion(new payoutPlaceholder());
 
         try {
 
